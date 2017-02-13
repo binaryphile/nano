@@ -13,7 +13,15 @@ includes () {
   return 1
 }
 
-joina   () { local IFS=$1; shift; local _ref=$1[*]; puts "${!_ref}" ;}
+joina () {
+  local IFS=$1
+  local _refs="$2[*]"
+  local _ref=$3
+
+  local "$_ref" || return
+  ret "$_ref" "${!_refs}"
+}
+
 puts    () { printf '%s\n' "$1"             ;}
 putserr () { puts "$1" >&2                  ;}
 

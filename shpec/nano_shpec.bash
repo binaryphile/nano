@@ -6,13 +6,17 @@ shpec_source lib/nano.bash
 
 describe 'joina'
   it "joins an array with a delimiter"
-    declare -a samples=([0]=zero [1]=one)
-    assert equal 'zero@one' "$(joina '@' samples)"
+    samples=( one two )
+    result=''
+    joina '@' samples result
+    assert equal 'one@two' "$result"
   end
 
   it "joins an array with one item"
-    declare -a samples=([0]=zero)
-    assert equal 'zero' "$(joina ';' samples)"
+    samples=( one )
+    result=''
+    joina '@' samples result
+    assert equal 'one' "$result"
   end
 end
 
