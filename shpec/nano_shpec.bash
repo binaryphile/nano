@@ -99,8 +99,7 @@ end
 describe 'splits'
   it "splits a string into an array on a partition character"
     results=()
-    sample='a=b'
-    splits '=' "$sample" results
+    splits '=' 'a=b' results
     printf -v expected 'declare -a results=%s([0]="a" [1]="b")%s' \' \'
     assert equal "$expected" "$(declare -p results)"
   end
