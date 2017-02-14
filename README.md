@@ -17,8 +17,8 @@ API
 
     Unlike `echo`, `string` must be a single argument.
 
-- **`_ret <return_variable_name> <string_value|array_name|hash_name>`**
-  - return a value via a named reference variable
+- **`_ret <return_variable_name> <string_value|array_name|hash_name>`** -
+  return a value via a named reference variable
 
     `return_variable_name` must exist outside of your function scope,
     usually declared by its caller.  It must also be the appropriate
