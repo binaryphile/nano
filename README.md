@@ -11,7 +11,11 @@ API
 
 - **`_puts <string>`** - prints `<string>` with a newline
 
+    Unlike `echo`, `string` must be a single argument.
+
 - **`_putserr <string>`** - prints `<string>` with a newline to stderr
+
+    Unlike `echo`, `string` must be a single argument.
 
 - **`_ret <return_variable_name> <string_value|array_name|hash_name>`**
   - return a value via a named reference variable
