@@ -1,36 +1,26 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
-errexit () { putserr "$1"; exit "${2:-1}" ;}
+_errexit () { _putserr "$1"; exit "${2:-1}" ;}
 
-includes () {
-  local search_item=$1; shift
-  local item
-
-  for item in "$@"; do
-    [[ $item == "$search_item" ]] && return
-  done
-  return 1
-}
-
-joina () {
+_joina () {
   local IFS=$1
   local _refs="$2[*]"
   local _ref=$3
 
   local "$_ref" || return
-  ret "$_ref" "${!_refs}"
+  _ret "$_ref" "${!_refs}"
 }
 
-puts    () { printf '%s\n' "$1"             ;}
-putserr () { puts "$1" >&2                  ;}
+_puts    () { printf '%s\n' "$1"  ;}
+_putserr () { _puts "$1" >&2      ;}
 
-ret () {
-  [[ $(_type "$2") == [aA] ]] && { _set_ary "$@"; return ;}
-  _set_scalar "$@"
+_ret () {
+  [[ $(__type "$2") == [aA] ]] && { __seta "$@"; return ;}
+  __sets "$@"
 }
 
-_set_ary () {
+__seta () {
   if [[ $1 == "$2" ]]; then
     local _ref
     _ref=$(declare -p "$2")
@@ -47,12 +37,12 @@ _set_ary () {
   done
 }
 
-_set_scalar () {
+__sets () {
   unset  -v "$1" || return
   printf -v "$1" '%s' "$2"
 }
 
-splits () {
+_splits () {
   local delimiter=$1
   local string=$2
   local ref=$3
@@ -61,10 +51,10 @@ splits () {
   IFS=$delimiter read -ra result <<<"$string" ||:
 
   local "$ref" || return
-  ret "$ref" result
+  _ret "$ref" result
 }
 
-_type () {
+__type () {
   local declaration
 
   declaration=$(declare -p "$1" 2>/dev/null) || return
