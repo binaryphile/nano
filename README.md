@@ -20,10 +20,10 @@ API
 - **`_ret <return_variable_name> <string_value|array_name|hash_name>`**
   - return a value via a named reference variable
 
-    `return_variable_name` must exist outside of your function
-    (usually declared by its caller) and be the appropriate type
-    (scalar, array, hash).  A hash is more properly known as an
-    associative array.
+    `return_variable_name` must exist outside of your function scope,
+    usually declared by its caller.  It must also be the appropriate
+    type; scalar, array or hash.  (A hash is more properly known as an
+    associative array)
 
     `return_variable_name` is therefore usually passed into your
     function.  Example:
@@ -38,13 +38,20 @@ API
     Before calling `_ret`, your function must also declare
     `return_variable_name` locally, as shown.  Since the variable name
     may not be a valid identifier string, this is usually done with a
-    `return` clause in case it errors.
+    `return` clause in case it errors.  This should also only be done
+    right before calling `_ret`.
 
-    The returned value may be a scalar literal, or may be contained in a
-    named array or hash.  If passing back an array or hash, simply pass
-    the name as the second argument.  If passing back a scalar value,
-    use the value, not the variable name.
+    Calling `_ret` unsets the named value in your function's scope.  If
+    the variable name is used by one of your local variables (always
+    possible), then your variable will be unset.  Therefore you may not
+    be able to rely on variables after calling `_ret`, so you should
+    only do so right before your function returns.
+
+    The returned value(s) may be a scalar literal, or may be contained
+    in a named array or hash.  If passing back an array or hash, simply
+    pass the variable name as the second argument.  If passing back a
+    scalar value, use the value, not the variable name.
 
     As a corollary, the `_ret` function is unable to pass back the names
-    of valid arrays or hashes as scalar values.  They will always be
-    passed as their array values.
+    of arrays or hashes as scalar values.  They will always be passed as
+    their array values.  Caveat emptor.
