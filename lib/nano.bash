@@ -5,11 +5,11 @@ _errexit () { _putserr "$1"; exit "${2:-1}" ;}
 
 _joina () {
   local IFS=$1
-  local _refs="$2[*]"
+  local _to_be_joined="$2[*]"
   local _ref=$3
 
   local "$_ref" || return
-  _ret "$_ref" "${!_refs}"
+  _ret "$_ref" "${!_to_be_joined}"
 }
 
 _puts    () { printf '%s\n' "$1"  ;}
@@ -21,6 +21,8 @@ _ret () {
 }
 
 __seta () {
+  local _key
+
   if [[ $1 == "$2" ]]; then
     local _ref
     _ref=$(declare -p "$2")
@@ -28,7 +30,6 @@ __seta () {
   else
     local -n _ref=$2
   fi
-  local _key
 
   unset -v "$1" || return
   eval "$1=()"
@@ -43,12 +44,12 @@ __sets () {
 }
 
 _splits () {
-  local delimiter=$1
-  local string=$2
+  local IFS=$1
+  local to_be_split=$2
   local ref=$3
   local result=()
 
-  IFS=$delimiter read -ra result <<<"$string" ||:
+  read -ra result <<<"$to_be_split" ||:
 
   local "$ref" || return
   _ret "$ref" result
