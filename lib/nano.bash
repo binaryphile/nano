@@ -2,6 +2,7 @@
 readonly _nano=loaded
 
 _puts    () { printf '%s\n' "$1"  ;}
+_putserr () { _puts "$1" >&2      ;}
 
 _ret () {
   [[ $(__type "$2") == [aA] ]] && { __seta "$@"; return ;}

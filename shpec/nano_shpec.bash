@@ -10,6 +10,12 @@ describe '_puts'
   end
 end
 
+describe '_putserr'
+  it "outputs a string on stderr"
+    assert equal sample "$(_putserr 'sample' 2>&1)"
+  end
+end
+
 describe '_ret'
   it "returns an array in a named variable"
     results=()
