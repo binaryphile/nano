@@ -4,7 +4,7 @@ nano
 A nano-sized bash library
 
 Defines a handful of less-visible (with leading underscores) functions
-that are useful for writing other libraries.
+which are useful for writing other libraries.
 
 API
 ===
@@ -36,9 +36,9 @@ API
         }
 
     Before calling `_ret`, your function must also declare
-    `return_variable_name` locally.  Since the variable name may not
-    be a valid identifier string, this is usually done with a `return`
-    clause in case it errors.
+    `return_variable_name` locally, as shown.  Since the variable name
+    may not be a valid identifier string, this is usually done with a
+    `return` clause in case it errors.
 
     The returned value may be a scalar literal, or may be contained in a
     named array or hash.  If passing back an array or hash, simply pass
