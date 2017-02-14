@@ -1,19 +1,7 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
-_errexit () { _putserr "$1"; exit "${2:-1}" ;}
-
-_joina () {
-  local IFS=$1
-  local _to_be_joined="$2[*]"
-  local _ref=$3
-
-  local "$_ref" || return
-  _ret "$_ref" "${!_to_be_joined}"
-}
-
 _puts    () { printf '%s\n' "$1"  ;}
-_putserr () { _puts "$1" >&2      ;}
 
 _ret () {
   [[ $(__type "$2") == [aA] ]] && { __seta "$@"; return ;}
@@ -43,21 +31,9 @@ __sets () {
   printf -v "$1" '%s' "$2"
 }
 
-_splits () {
-  local IFS=$1
-  local to_be_split=$2
-  local ref=$3
-  local result=()
-
-  read -ra result <<<"$to_be_split" ||:
-
-  local "$ref" || return
-  _ret "$ref" result
-}
-
 __type () {
   local declaration
 
   declaration=$(declare -p "$1" 2>/dev/null) || return
-  echo "${declaration:9:1}"
+  _puts "${declaration:9:1}"
 }

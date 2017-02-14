@@ -4,31 +4,9 @@ unset -v library
 
 shpec_source lib/nano.bash
 
-describe '_joina'
-  it "joins an array with a delimiter"
-    samples=( one two )
-    result=''
-    _joina '@' samples result
-    assert equal 'one@two' "$result"
-  end
-
-  it "joins an array with one item"
-    samples=( one )
-    result=''
-    _joina '@' samples result
-    assert equal 'one' "$result"
-  end
-end
-
 describe '_puts'
   it "outputs a string on stdout"
     assert equal sample "$(_puts 'sample')"
-  end
-end
-
-describe '_putserr'
-  it "outputs a string on stderr"
-    assert equal sample "$(_putserr 'sample' 2>&1)"
   end
 end
 
@@ -93,15 +71,6 @@ describe '_ret'
     samplef () { local result=one; local "$1" || return; _ret "$1" "$result" ;}
     samplef result
     assert equal one "$result"
-  end
-end
-
-describe '_splits'
-  it "_splits a string into an array on a partition character"
-    results=()
-    _splits '=' 'a=b' results
-    printf -v expected 'declare -a results=%s([0]="a" [1]="b")%s' \' \'
-    assert equal "$expected" "$(declare -p results)"
   end
 end
 
