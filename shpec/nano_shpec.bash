@@ -4,6 +4,22 @@ unset -v library
 
 shpec_source lib/nano.bash
 
+describe '_joina'
+  it "joins an array with a delimiter"
+    samples=( one two )
+    result=''
+    _joina '@' samples result
+    assert equal 'one@two' "$result"
+  end
+
+  it "joins an array with one item"
+    samples=( one )
+    result=''
+    _joina '@' samples result
+    assert equal 'one' "$result"
+  end
+end
+
 describe '_puts'
   it "outputs a string on stdout"
     assert equal sample "$(_puts 'sample')"

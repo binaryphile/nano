@@ -1,6 +1,15 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
+_joina () {
+  local IFS=$1
+  local _to_be_joined="$2[*]"
+  local _ref=$3
+
+  local "$_ref" || return
+  _ret "$_ref" "${!_to_be_joined}"
+}
+
 _puts    () { printf '%s\n' "$1"  ;}
 _putserr () { _puts "$1" >&2      ;}
 
