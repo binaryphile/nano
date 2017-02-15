@@ -19,14 +19,17 @@ API
     `string` must be a single argument.
 
 - **`_ret <return_variable_name> <string_value|array_name|hash_name>`** -
-  return a value via a named reference variable
+  return a value via a named return variable
 
     `return_variable_name` must exist outside of your function scope,
-    usually declared by its caller.  It must also be the appropriate
-    type; scalar, array or hash (a.k.a. associative array).
+    usually declared by your function's caller.  The existing variable
+    must also be the appropriate type; scalar, array or hash (a.k.a.
+    associative array).
 
     `return_variable_name` is therefore usually passed into your
-    function.  Example:
+    function as an argument, which is then passed onto `_ret`.
+
+    Example:
 
         myfunc () {
           return_variable_name=$1
@@ -34,6 +37,11 @@ API
           local "$return_variable_name" || return
           _ret "$return_variable_name" 'my value' # pass a scalar value
         }
+
+    You could accomplish the same thing without `_ret` by using a
+    indirection via `local -n ref` or `${!ref}`, but both of these allow
+    the referenced variable name to conflict with your local variables.
+    `_ret` prevents naming conflicts with your local variables.
 
     Before calling `_ret`, your function must also declare
     `return_variable_name` locally, as shown.  Since the variable name
@@ -56,3 +64,8 @@ API
     As a corollary, the `_ret` function is unable to pass back the names
     of arrays or hashes as scalar values.  They will always be passed as
     their array values.  Be forewarned.
+
+    `_ret` is based on the discussion [here], but is enhanced to pass
+    arrays by name.
+
+[here]: http://fvue.nl/wiki/Bash:_Passing_variables_by_reference
