@@ -62,7 +62,7 @@ nano API
   clause in case it errors.  This should only be done right before
   calling `_ret`.
 
-  Calling `_ret` unsets the named varialbe in your function's scope.
+  Calling `_ret` unsets the named variable in your function's scope.
   If the variable name is also used by one of your local variables
   (always possible), then your variable will be unset.  Therefore you
   may not be able to rely on variables after calling `_ret`, so you
