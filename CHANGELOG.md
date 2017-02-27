@@ -21,5 +21,5 @@ v0 in semver parlance.
 
   [Keep a Changelog]: http://keepachangelog.com/
   [Semantic Versioning]: http://semver.org/
-  [Unreleased]: https://github.com/binaryphile/nano/compare/v10.11.10...v11.10
-  [v10.11.10]: https://github.com/binaryphile/nano/compare/v10.10.10...v10.10.11
+  [Unreleased]: https://github.com/binaryphile/nano/compare/v10.11...v10.11.10
+  [v10.11.10]: https://github.com/binaryphile/nano/tree/v10.11.10
