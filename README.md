@@ -56,10 +56,10 @@ locally, as shown. Since the variable name may not be a valid identifier
 string, this is usually done with a `return` clause in case it errors.
 This should only be done right before calling `_ret`.
 
-You could accomplish the same thing without `_ret` by using a
-indirection via `local -n ref` or `${!ref}`, but both of these allow the
-referenced variable name to conflict with your local variables. `_ret`
-prevents naming conflicts with your local variables.
+You could accomplish the same thing without `_ret` by using indirection
+via `local -n ref` or `${!ref}`, but both of these allow the referenced
+variable name to conflict with your local variables. `_ret` prevents
+naming conflicts with your local variables.
 
 Calling `_ret`, however, does unset the named variable in your
 function's scope. If the variable name is also used by one of your local
