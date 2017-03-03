@@ -8,6 +8,10 @@ v0 in semver parlance.
 [Unreleased]
 ------------
 
+### Added
+
+-   `all-shpecs` test runner
+
 ### Changed
 
 -   readme formatting
@@ -21,5 +25,5 @@ v0 in semver parlance.
 
   [Keep a Changelog]: http://keepachangelog.com/
   [Semantic Versioning]: http://semver.org/
-  [Unreleased]: https://github.com/binaryphile/nano/compare/v10.11...v10.11.10
+  [Unreleased]: https://github.com/binaryphile/nano/compare/v10.11.10...v10.11
   [v10.11.10]: https://github.com/binaryphile/nano/tree/v10.11.10
