@@ -1,4 +1,4 @@
-nano
+nano [![Build Status](https://travis-ci.org/binaryphile/nano.svg?branch=master)](https://travis-ci.org/binaryphile/nano)
 ====
 
 A nano-sized bash library
