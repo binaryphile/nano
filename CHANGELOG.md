@@ -5,8 +5,14 @@ The format is based on [Keep a Changelog] and this project adheres to
 [Semantic Versioning], with the minor exception that v10 is considered
 v0 in semver parlance.
 
-[Unreleased]
-------------
+[v10.11.11] - 2017-04-07
+------------------------
+
+### Added
+
+-   `all-shpecs` test runner
+
+-   Travis CI
 
 ### Changed
 
@@ -21,5 +27,5 @@ v0 in semver parlance.
 
   [Keep a Changelog]: http://keepachangelog.com/
   [Semantic Versioning]: http://semver.org/
-  [Unreleased]: https://github.com/binaryphile/nano/compare/v10.11...v10.11.10
+  [v10.11.11]: https://github.com/binaryphile/nano/compare/v10.11.10...v10.11.11
   [v10.11.10]: https://github.com/binaryphile/nano/tree/v10.11.10
