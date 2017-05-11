@@ -2,11 +2,17 @@ Change Log
 ==========
 
 The format is based on [Keep a Changelog] and this project adheres to
-[Semantic Versioning], with the minor exception that v10 is considered
-v0 in semver parlance.
+[Semantic Versioning].
 
-[v10.11.12] - 2017-04-10
-------------------------
+[v0.1.3] - 2017-05-11
+---------------------
+
+### Changed
+
+-   reverted to normal versioning
+
+[v0.1.2] - 2017-04-10
+---------------------
 
 ### Changed
 
@@ -16,8 +22,8 @@ v0 in semver parlance.
 
 -   `all-shpecs` script invokes bash explicitly
 
-[v10.11.11] - 2017-04-07
-------------------------
+[v0.1.1] - 2017-04-07
+---------------------
 
 ### Added
 
@@ -29,8 +35,8 @@ v0 in semver parlance.
 
 -   readme formatting
 
-[v10.11.10] - 2017-02-14
-------------------------
+[v0.1.0] - 2017-02-14
+---------------------
 
 ### Added
 
@@ -38,6 +44,7 @@ v0 in semver parlance.
 
   [Keep a Changelog]: http://keepachangelog.com/
   [Semantic Versioning]: http://semver.org/
-  [v10.11.12]: https://github.com/binaryphile/nano/compare/v10.11.11...v10.11.12
-  [v10.11.11]: https://github.com/binaryphile/nano/compare/v10.11.10...v10.11.11
-  [v10.11.10]: https://github.com/binaryphile/nano/tree/v10.11.10
+  [v0.1.3]: https://github.com/binaryphile/nano/compare/v0.1.2...v0.1.3
+  [v0.1.2]: https://github.com/binaryphile/nano/compare/v0.1.1...v0.1.2
+  [v0.1.1]: https://github.com/binaryphile/nano/compare/v0.1.0...v0.1.1
+  [v0.1.0]: https://github.com/binaryphile/nano/tree/v0.1.0
