@@ -1,6 +1,77 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
+couple () {
+  [[ $2 == 'with' ]] || return
+  [[ $1 == '('*')' ]] && local -a ary=$1 || local -a ary=${!1}
+  local IFS=$3
+
+  __=${ary[*]}
+}
+
+die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
+
+decouple () {
+  [[ $2 == 'on' ]] || return
+  local IFS=$3
+  local results=()
+
+  results=( $1 )
+  ret results
+}
+
+grab () {
+  [[ $2 == 'from'   ]] || return
+  [[ $3 == '('*')'  ]] && local -A argh=$3 || local -A argh=${!3}
+  case $1 in
+    '('*')' ) local -a vars=$1                ;;
+    '*'     ) local -a vars=( "${!argh[@]}" ) ;;
+    *       ) local -a vars=( "$1"          ) ;;
+  esac
+  local var
+  local statement
+  local statements=()
+  local IFS=$IFS
+
+  for var in "${vars[@]}"; do
+    printf -v statement 'local %s=%q' "$var" "${argh[$var]}"
+    statements+=( "$statement" )
+  done
+  IFS=';'
+  echo "eval ${statements[*]}"
+}
+
+instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
+
+parse_options () {
+  local -A optionh
+  local args=()
+  local flags=()
+
+  while (( $# )); do
+    case $1 in
+      --*=*   ) set -- "${1%%=*}" "${1#*=}" "${@:2}";;
+      -[^-]?* )
+        [[ $1 =~ ${1//?/(.)} ]]
+        flags=( $(printf -- '-%s ' "${BASH_REMATCH[@]:2}") )
+        set -- "${flags[@]}" "${@:2}"
+        ;;
+    esac
+    case $1 in
+      '-c' | '--config-file'  ) optionh[config_file]=$2         ; shift                 ;;
+      '-a' | '--app'          ) optionh[app]=$2                 ; shift                 ;;
+      '-d' | '--dev-channel'  ) optionh[dev_channel]=$2         ; shift                 ;;
+      '--'                    ) shift                           ; args+=( "$@" ); break ;;
+      -*                      ) puterr "unsupported option $1"  ; return 1              ;;
+      *                       ) args+=( "$@" )                  ; break                 ;;
+    esac
+    shift
+  done
+  ret args
+  optionh[arg]=$__
+  ret optionh
+}
+
 project () {
   local project_name=$1
   local depth=${2:-1}
@@ -9,16 +80,32 @@ project () {
   local path=''
   local statements=()
 
-  IFS=$'\n' read -rd '' -a statements <<'  EOS' ||:
-    [[ -n "${_%s-}" && -z "${reload-}"  ]] && return
-    [[ -n "${reload-}"                  ]] && { unset -v reload && echo reloaded || return ;}
-    [[ -z "${_%s-}"                     ]] && readonly _%s=loaded
+  get_ary statements <<'  EOS'
+    [[ -n ${_%s:-} && -z ${reload:-}  ]] && return
+    [[ -n ${reload:-}                 ]] && { unset -v reload && echo reloaded || return ;}
+    [[ -z ${_%s:-}                    ]] && readonly _%s=loaded
 
     %s_ROOT=$(readlink -f "$(dirname "$(readlink -f "$BASH_SOURCE")")"%s)
   EOS
-  (( depth )) && for i in $(eval "echo {1..$depth}"); do path+=/..; done
+  (( depth )) && for (( i = 0; i < depth; i++ )); do path+=/..; done
   IFS=';'
   printf "eval ${statements[*]}\n" "$project_name" "$project_name" "$project_name" "${project_name^^}" "$path"
+}
+
+put     () { printf '%s\n' "$@"   ;}
+puterr  () { put "Error: $1" >&2  ;}
+get_ary () { IFS=$'\n' read -rd '' -a "$1" ||: ;}
+get_str () { read -rd '' "$1" ||: ;}
+
+ret () {
+  local ref=$1
+  local quote
+
+  __=$(declare -p "$ref" 2>/dev/null) || return
+  [[ ${__:9:1} == [aA] ]] && quote=\' || quote=\"
+  __=${__#*=}
+  __=${__#$quote}
+  __=${__%$quote}
 }
 
 return_if_sourced () { echo 'eval return 0 2>/dev/null ||:' ;}
@@ -30,7 +117,7 @@ strict_mode () {
   local option
   local statements=()
 
-  IFS=$'\n' read -rd '' -a statements <<'  EOS' ||:
+  get_ary statements <<'  EOS' ||:
     set %so errexit
     set %so errtrace
     set %so nounset
@@ -47,12 +134,23 @@ strict_mode () {
   printf "eval ${statements[*]}\n" "$option" "$option" "$option" "$option" "$callback"
 }
 
+stuff () {
+  [[ $2 == 'into'   ]] || return
+  [[ $1 == '('*')'  ]] && local -a refs=$1    || local -a refs=( "$1" )
+  [[ $3 == '('*')'  ]] && local -A resulth=$3 || local -A resulth=${!3}
+  local ref
+
+  for ref in "${refs[@]}"; do
+    resulth[$ref]=${!ref}
+  done
+  ret resulth
+}
+
 traceback () {
   local frame
   local val
 
-  set +o errexit
-  trap - ERR
+  $(strict_mode off)
   printf '\nTraceback:  '
   frame=0
   while val=$(caller "$frame"); do
@@ -64,3 +162,17 @@ traceback () {
   done
   exit 1
 }
+
+update () {
+  [[ $2 == 'with'   ]] || return
+  [[ $1 == '('*')'  ]] && local -A hash=$1     || local -A hash=${!1}
+  [[ $3 == '('*')'  ]] && local -A updateh=$3  || local -A updateh=${!3}
+  local key
+
+  for key in "${!updateh[@]}"; do
+    hash[$key]=${updateh[$key]}
+  done
+  ret hash
+}
+
+with () { ret "$1"; grab '*' from "$__" ;}
