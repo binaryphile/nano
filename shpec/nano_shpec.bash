@@ -81,13 +81,31 @@ describe grab
 end
 
 describe options_new
-  it "accepts flag options"; (
+  it "creates a definition of a flag option"; (
     get_here_ary samples <<'    EOS'
-      (f '' '' 'a flag')
+      ( f '' '' 'a flag' )
+    EOS
+    get_here_str expected <<'    EOS'
+      ([0]="([argument]=\"\" [help]=\\"a flag\\" [short]=\\"f\\" [long]=\\"\\" )")
     EOS
     inspect samples
     options_new __
-    assert equal '([0]="([argument]=\"\" [help]=\"a flag\" [short]=\"f\" [long]=\"\" )")' "${!__}"
+    $(grab defn from "${!__}")
+    assert equal "$expected" "$defn"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "creates a definition of a flag option"; (
+    get_here_ary samples <<'    EOS'
+      ( f '' '' 'a flag' )
+    EOS
+    get_here_str expected <<'    EOS'
+      ([0]="([argument]=\"\" [help]=\\"a flag\\" [short]=\\"f\\" [long]=\\"\\" )")
+    EOS
+    inspect samples
+    options_new __
+    $(grab defn from "${!__}")
+    assert equal "$expected" "$defn"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
@@ -101,11 +119,11 @@ end
 #     options_new __
 #     options_parse "$__" -f
 #     declare -A resulth=$__
-#     assert equal true "${resulth[flag_f]}"
+#     assert equal 1 "${resulth[flag_f]}"
 #     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
 #   end
 # end
-
+#
 describe part
   it "splits a string on a delimiter"
     part one@two on @

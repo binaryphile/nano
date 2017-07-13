@@ -24,21 +24,26 @@ grab () {
   echo "eval ${statements[*]}"
 }
 
+index () {
+  :
+}
+
 instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
 
 options_new () {
-  [[ $1 == '('*')' ]] && local -a defs=$1 || local -a defs=${!1}
-  declare -p __instanceh >/dev/null 2>&1  || declare -Ag __instanceh=([next_id]=0)
+  [[ $1 == '('*')' ]] && local -a defns=$1  || local -a defns=${!1}
+  declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=([next_id]=0)
+  local -A optionh=()
   local -a options=()
   local argument
-  local def
+  local defn
   local help
   local long
   local short
   local spaces
 
-  for def in "${defs[@]}"; do
-    local -a items=$def
+  for defn in "${defns[@]}"; do
+    local -a items=$defn
     short=${items[0]}
     long=${items[1]}
     argument=${items[2]}
@@ -49,16 +54,25 @@ options_new () {
 
   inspect __instanceh
   $(grab next_id from __)
+  [[ -z ${__instanceh[$next_id]} ]] || return
   inspect options
+  optionh=( [defn]=$__ )
+  inspect optionh
   __instanceh[$next_id]=$__
   __=__instanceh["$next_id"]
   __instanceh[next_id]=$(( next_id++ ))
 }
 
-parse_options () {
+options_parse () {
+  local self=$1; shift
   local -A optionh
   local args=()
   local flags=()
+  local i
+
+  $(grab '( option type )' from "${!self}")
+  local -a options=$option
+  local -a types=$type
 
   while (( $# )); do
     case $1 in
@@ -69,13 +83,20 @@ parse_options () {
         set -- "${flags[@]}" "${@:2}"
         ;;
     esac
+    index options "$1" && {
+      i=$__
+      option=${options[i]}
+      case ${types[i]} in
+        'flag'      ) optionh[flag_$option]=1         ;;
+        'argument'  ) optionh[$option]=$2     ; shift ;;
+      esac
+      shift
+      continue
+    }
     case $1 in
-      '-c' | '--config-file'  ) optionh[config_file]=$2         ; shift                 ;;
-      '-a' | '--app'          ) optionh[app]=$2                 ; shift                 ;;
-      '-d' | '--dev-channel'  ) optionh[dev_channel]=$2         ; shift                 ;;
-      '--'                    ) shift                           ; args+=( "$@" ); break ;;
-      -*                      ) puterr "unsupported option $1"  ; return 1              ;;
-      *                       ) args+=( "$@" )                  ; break                 ;;
+      '--'  ) shift                           ; args+=( "$@" ); break ;;
+      -*    ) puterr "unsupported option $1"  ; return 1              ;;
+      *     ) args+=( "$@" )                  ; break                 ;;
     esac
     shift
   done
@@ -96,21 +117,20 @@ part () {
 project () {
   local project_name=$1
   local depth=${2:-1}
-  local IFS=$IFS
   local i
-  local path=''
+  local path
   local statements=()
 
-  get_here_ary statements <<'  EOS'
+  get_here_str statement <<'  EOS'
     [[ -n ${_%s:-} && -z ${reload:-}  ]] && return
     [[ -n ${reload:-}                 ]] && { unset -v reload && echo reloaded || return ;}
     [[ -z ${_%s:-}                    ]] && readonly _%s=loaded
 
     %s_ROOT=$(readlink -f "$(dirname "$(readlink -f "$BASH_SOURCE")")"%s)
   EOS
+  path=''
   (( depth )) && for (( i = 0; i < depth; i++ )); do path+=/..; done
-  IFS=';'
-  printf "eval ${statements[*]}\n" "$project_name" "$project_name" "$project_name" "${project_name^^}" "$path"
+  printf "$statement\n" "$project_name" "$project_name" "$project_name" "${project_name^^}" "$path"
 }
 
 put     () { printf '%s\n' "$@"   ;}
