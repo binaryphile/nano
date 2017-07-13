@@ -2,20 +2,7 @@ library=../lib/nano.bash
 source "$library" 2>/dev/null || source "${BASH_SOURCE%/*}/$library"
 unset -v library
 
-describe 'couple'
-  it "joins an array literal with a delimiter"
-    couple '( one two )' with @
-    assert equal one@two "$__"
-  end
-
-  it "joins an array literal by name with a delimiter"
-    sample='( one two )'
-    couple sample with @
-    assert equal one@two "$__"
-  end
-end
-
-describe 'die'
+describe die
   it "exits without an error message"; (
     # stop_on_error off
     result=$(die 2>&1)
@@ -45,20 +32,7 @@ describe 'die'
   end
 end
 
-describe 'decouple'
-  it "splits a string on a delimiter"
-    decouple one@two on @
-    assert equal '([0]="one" [1]="two")' "$__"
-  end
-
-  it "doesn't split a string by name with a delimiter"
-    sample=one@two
-    decouple sample on @
-    assert equal '([0]="sample")' "$__"
-  end
-end
-
-describe 'grab'
+describe grab
   it "instantiates a key/value pair from a hash literal as a local"
     result=$(grab one from '([one]=1)')
     assert equal 'eval local one=1' "$result"
@@ -103,5 +77,57 @@ describe 'grab'
     sample=one
     result=$(grab sample from '([one]=1)')
     assert equal "eval local sample=''" "$result"
+  end
+end
+
+describe options_new
+  it "accepts flag options"; (
+    get_here_ary samples <<'    EOS'
+      (f '' '' 'a flag')
+    EOS
+    inspect samples
+    options_new __
+    assert equal '([0]="([argument]=\"\" [help]=\"a flag\" [short]=\"f\" [long]=\"\" )")' "${!__}"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+end
+
+# describe options_parse
+#   it "accepts flag options"; (
+#     get_ary samples <<'    EOS'
+#       (f '' '' 'a flag')
+#     EOS
+#     inspect samples
+#     options_new __
+#     options_parse "$__" -f
+#     declare -A resulth=$__
+#     assert equal true "${resulth[flag_f]}"
+#     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+#   end
+# end
+
+describe part
+  it "splits a string on a delimiter"
+    part one@two on @
+    assert equal '([0]="one" [1]="two")' "$__"
+  end
+
+  it "doesn't split a string by name with a delimiter"
+    sample=one@two
+    part sample on @
+    assert equal '([0]="sample")' "$__"
+  end
+end
+
+describe wed
+  it "joins an array literal with a delimiter"
+    wed '( one two )' with @
+    assert equal one@two "$__"
+  end
+
+  it "joins an array literal by name with a delimiter"
+    sample='( one two )'
+    wed sample with @
+    assert equal one@two "$__"
   end
 end

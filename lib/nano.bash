@@ -1,24 +1,7 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
-couple () {
-  [[ $2 == 'with' ]] || return
-  [[ $1 == '('*')' ]] && local -a ary=$1 || local -a ary=${!1}
-  local IFS=$3
-
-  __=${ary[*]}
-}
-
 die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
-
-decouple () {
-  [[ $2 == 'on' ]] || return
-  local IFS=$3
-  local results=()
-
-  results=( $1 )
-  ret results
-}
 
 grab () {
   [[ $2 == 'from'   ]] || return
@@ -42,6 +25,35 @@ grab () {
 }
 
 instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
+
+options_new () {
+  [[ $1 == '('*')' ]] && local -a defs=$1 || local -a defs=${!1}
+  declare -p __instanceh >/dev/null 2>&1  || declare -Ag __instanceh=([next_id]=0)
+  local -a options=()
+  local argument
+  local def
+  local help
+  local long
+  local short
+  local spaces
+
+  for def in "${defs[@]}"; do
+    local -a items=$def
+    short=${items[0]}
+    long=${items[1]}
+    argument=${items[2]}
+    help=${items[3]}
+    stuff '(short long argument help)' into '()'
+    options+=( "$__" )
+  done
+
+  inspect __instanceh
+  $(grab next_id from __)
+  inspect options
+  __instanceh[$next_id]=$__
+  __=__instanceh["$next_id"]
+  __instanceh[next_id]=$(( next_id++ ))
+}
 
 parse_options () {
   local -A optionh
@@ -67,9 +79,18 @@ parse_options () {
     esac
     shift
   done
-  ret args
+  inspect args
   optionh[arg]=$__
-  ret optionh
+  inspect optionh
+}
+
+part () {
+  [[ $2 == 'on' ]] || return
+  local IFS=$3
+  local results=()
+
+  results=( $1 )
+  inspect results
 }
 
 project () {
@@ -80,7 +101,7 @@ project () {
   local path=''
   local statements=()
 
-  get_ary statements <<'  EOS'
+  get_here_ary statements <<'  EOS'
     [[ -n ${_%s:-} && -z ${reload:-}  ]] && return
     [[ -n ${reload:-}                 ]] && { unset -v reload && echo reloaded || return ;}
     [[ -z ${_%s:-}                    ]] && readonly _%s=loaded
@@ -95,17 +116,35 @@ project () {
 put     () { printf '%s\n' "$@"   ;}
 puterr  () { put "Error: $1" >&2  ;}
 get_ary () { IFS=$'\n' read -rd '' -a "$1" ||: ;}
+
+get_here_ary () {
+  get_ary   "$1"
+  strip_ary "$1"
+}
+
+get_here_str () {
+  local _results=()
+  local IFS=$IFS
+
+  get_here_ary _results
+  IFS=$'\n'
+  printf -v "$1" '%s' "${_results[*]}"
+}
+
 get_str () { read -rd '' "$1" ||: ;}
 
-ret () {
-  local ref=$1
-  local quote
-
-  __=$(declare -p "$ref" 2>/dev/null) || return
-  [[ ${__:9:1} == [aA] ]] && quote=\' || quote=\"
+inspect () {
+  __=$(declare -p "$1" 2>/dev/null) || return
+  [[ ${__:9:1} != [aA] ]] && {
+    __=${__#*=}
+    __=${__#\"}
+    __=${__%\"}
+    return
+  }
   __=${__#*=}
-  __=${__#$quote}
-  __=${__%$quote}
+  __=${__#\'}
+  __=${__%\'}
+  __=${__//\'\\\'\'/\'}
 }
 
 return_if_sourced () { echo 'eval return 0 2>/dev/null ||:' ;}
@@ -117,7 +156,7 @@ strict_mode () {
   local option
   local statements=()
 
-  get_ary statements <<'  EOS' ||:
+  get_here_ary statements <<'  EOS'
     set %so errexit
     set %so errtrace
     set %so nounset
@@ -134,6 +173,22 @@ strict_mode () {
   printf "eval ${statements[*]}\n" "$option" "$option" "$option" "$option" "$callback"
 }
 
+strip_ary () {
+  local _ary_ref=$1
+  local _i
+  local _indices=()
+  local _leading_whitespace
+  local _ref
+
+  _indices=( $(eval 'echo ${!'"$_ary_ref"'[@]}') )
+  _ref=$_ary_ref[${_indices[0]}]
+  _leading_whitespace=${!_ref%%[^[:space:]]*}
+  for _i in "${_indices[@]}"; do
+    _ref=$_ary_ref[$_i]
+    printf -v "$_ref" '%s' "${!_ref:${#_leading_whitespace}}"
+  done
+}
+
 stuff () {
   [[ $2 == 'into'   ]] || return
   [[ $1 == '('*')'  ]] && local -a refs=$1    || local -a refs=( "$1" )
@@ -143,7 +198,7 @@ stuff () {
   for ref in "${refs[@]}"; do
     resulth[$ref]=${!ref}
   done
-  ret resulth
+  inspect resulth
 }
 
 traceback () {
@@ -172,7 +227,15 @@ update () {
   for key in "${!updateh[@]}"; do
     hash[$key]=${updateh[$key]}
   done
-  ret hash
+  inspect hash
 }
 
-with () { ret "$1"; grab '*' from "$__" ;}
+wed () {
+  [[ $2 == 'with' ]] || return
+  [[ $1 == '('*')' ]] && local -a ary=$1 || local -a ary=${!1}
+  local IFS=$3
+
+  __=${ary[*]}
+}
+
+with () { inspect "$1"; grab '*' from "$__" ;}
