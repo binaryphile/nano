@@ -183,24 +183,7 @@ strict_mode () {
     'off' ) option=+; callback=-          ;;
     *     ) return 1                      ;;
   esac
-  IFS=';'
-  printf "eval ${statements[*]}\n" "$option" "$option" "$option" "$option" "$callback"
-}
-
-strip_ary () {
-  local _ary_ref=$1
-  local _i
-  local _indices=()
-  local _leading_whitespace
-  local _ref
-
-  _indices=( $(eval 'echo ${!'"$_ary_ref"'[@]}') )
-  _ref=$_ary_ref[${_indices[0]}]
-  _leading_whitespace=${!_ref%%[^[:space:]]*}
-  for _i in "${_indices[@]}"; do
-    _ref=$_ary_ref[$_i]
-    printf -v "$_ref" '%s' "${!_ref:${#_leading_whitespace}}"
-  done
+  printf "eval $statement\n" "$option" "$option" "$option" "$option" "$callback"
 }
 
 stuff () {
