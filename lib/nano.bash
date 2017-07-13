@@ -123,28 +123,26 @@ get_here_ary () {
 }
 
 get_here_str () {
-  local _results=()
-  local IFS=$IFS
-
-  get_here_ary _results
-  IFS=$'\n'
-  printf -v "$1" '%s' "${_results[*]}"
+  get_str "$1"
+  set -- "$1" "${!1%%[^[:space:]]*}"
+  printf -v "$1" '%s' "${!1:${#2}}"
+  printf -v "$1" '%s' "${!1//$'\n'$2/$'\n'}"
 }
 
-get_str () { read -rd '' "$1" ||: ;}
+get_str () { IFS=$'\n' read -rd '' "$1" ||: ;}
 
 inspect () {
   __=$(declare -p "$1" 2>/dev/null) || return
-  [[ ${__:9:1} != [aA] ]] && {
+  [[ ${__:9:1} == [aA] ]] && {
     __=${__#*=}
-    __=${__#\"}
-    __=${__%\"}
+    __=${__#\'}
+    __=${__%\'}
+    __=${__//\'\\\'\'/\'}
     return
   }
   __=${__#*=}
-  __=${__#\'}
-  __=${__%\'}
-  __=${__//\'\\\'\'/\'}
+  __=${__#\"}
+  __=${__%\"}
 }
 
 return_if_sourced () { echo 'eval return 0 2>/dev/null ||:' ;}
