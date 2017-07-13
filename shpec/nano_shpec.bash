@@ -33,37 +33,43 @@ describe die
 end
 
 describe grab
-  it "instantiates a key/value pair from a hash literal as a local"
-    result=$(grab one from '([one]=1)')
-    assert equal 'eval local one=1' "$result"
+  it "instantiates a key/value pair from a hash literal as a local"; (
+    $(grab one from '([one]=1)')
+    assert equal 1 "$one"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
-  it "instantiates more than one key/value pair from a hash literal"
-    result=$(grab '(one two)' from '([one]=1 [two]=2)')
-    assert equal 'eval local one=1;local two=2' "$result"
+  it "instantiates more than one key/value pair from a hash literal"; (
+    $(grab '(one two)' from '([one]=1 [two]=2)')
+    assert equal '1 2' "$one $two"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
-  it "instantiates all key/value pairs from a hash literal"
-    result=$(grab '*' from '([one]=1 [two]=2 [three]=3)')
-    assert equal 'eval local one=1;local two=2;local three=3' "$result"
+  it "instantiates all key/value pairs from a hash literal"; (
+    $(grab '*' from '([one]=1 [two]=2 [three]=3)')
+    assert equal '1 2 3' "$one $two $three"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
-  it "instantiates a key/value pair from a hash literal reference"
+  it "instantiates a key/value pair from a hash literal reference"; (
     sample='([one]=1)'
-    result=$(grab one from sample)
-    assert equal 'eval local one=1' "$result"
+    $(grab one from sample)
+    assert equal 1 "$one"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
-  it "instantiates more than one key/value pair from a hash literal reference"
+  it "instantiates more than one key/value pair from a hash literal reference"; (
     sample='([one]=1 [two]=2)'
-    result=$(grab '(one two)' from sample)
-    assert equal 'eval local one=1;local two=2' "$result"
+    $(grab '(one two)' from sample)
+    assert equal '1 2' "$one $two"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
-  it "instantiates all key/value pairs from a hash literal reference"
+  it "instantiates all key/value pairs from a hash literal reference"; (
     sample='([one]=1 [two]=2 [three]=3)'
-    result=$(grab '*' from sample)
-    assert equal 'eval local one=1;local two=2;local three=3' "$result"
+    $(grab '*' from sample)
+    assert equal '1 2 3' "$one $two $three"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 
   it "errors if \$3 isn't 'from'"; (
@@ -73,10 +79,11 @@ describe grab
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
-  it "doesn't work if the first argument is a reference"
+  it "doesn't work if the first argument is a reference"; (
     sample=one
     result=$(grab sample from '([one]=1)')
     assert equal "eval local sample=''" "$result"
+    return "$_shpec_failures" ); : $(( _shpec_failures+= $? ))
   end
 end
 

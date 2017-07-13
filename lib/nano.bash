@@ -13,15 +13,11 @@ grab () {
   esac
   local var
   local statement
-  local statements=()
-  local IFS=$IFS
 
   for var in "${vars[@]}"; do
-    printf -v statement 'local %s=%q' "$var" "${argh[$var]}"
-    statements+=( "$statement" )
+    printf -v statement '%slocal %s=%q\n' "$statement" "$var" "${argh[$var]}"
   done
-  IFS=';'
-  echo "eval ${statements[*]}"
+  echo "eval $statement"
 }
 
 index () {
@@ -138,8 +134,8 @@ puterr  () { put "Error: $1" >&2  ;}
 get_ary () { IFS=$'\n' read -rd '' -a "$1" ||: ;}
 
 get_here_ary () {
-  get_ary   "$1"
-  strip_ary "$1"
+  get_here_str  "$1"
+  get_ary       "$1" <<<"${!1}"
 }
 
 get_here_str () {
@@ -174,7 +170,7 @@ strict_mode () {
   local option
   local statements=()
 
-  get_here_ary statements <<'  EOS'
+  get_here_str statement <<'  EOS'
     set %so errexit
     set %so errtrace
     set %so nounset
