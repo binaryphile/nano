@@ -5,11 +5,11 @@ die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
 
 grab () {
   [[ $2 == 'from'   ]] || return
-  [[ $3 == '('*')'  ]] && local -A argh=$3 || local -A argh=${!3}
+  [[ $3 == '('*')'  ]] && local -A argh="$3" || local -A argh="${!3}"
   case $1 in
-    '('*')' ) local -a vars=$1                ;;
+    '('*')' ) local -a vars="$1"              ;;
     '*'     ) local -a vars=( "${!argh[@]}" ) ;;
-    *       ) local -a vars=( "$1"          ) ;;
+    *       ) local -a vars=(          "$1" ) ;;
   esac
   local var
   local statement
@@ -27,27 +27,29 @@ index () {
 instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
 
 options_new () {
-  [[ $1 == '('*')' ]] && local -a defns=$1  || local -a defns=${!1}
-  declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=([next_id]=0)
+  [[ $1 == '('*')' ]] && local -a inputs="$1" || local -a inputs="${!1}"
+  declare -p __instanceh >/dev/null 2>&1      || declare -Ag __instanceh=( [next_id]=0 )
   local -A optionh=()
-  local -a arguments=()
-  local -a options=()
-  local -a types=()
+  local -A resulth=()
   local argument
+  local arguments=()
   local defn
   local help
   local long
+  local defns=()
   local short
   local spaces
+  local types=()
 
-  for defn in "${defns[@]}"; do
-    local -a items=$defn
+  for defn in "${inputs[@]}"; do
+    local -a items="$defn"
     short=${items[0]}
     long=${items[1]}
     argument=${items[2]}
     help=${items[3]}
     stuff '( short long argument help )' into '()'
-    options+=( "$__" )
+    defns+=( "$__" )
+    optionh[${short:-long}]=$long
     [[ -z $argument ]] &&     types+=( flag ) ||     types+=(   argument  )
     [[ -z $argument ]] && arguments+=(   '' ) || arguments+=( "$argument" )
   done
@@ -55,13 +57,15 @@ options_new () {
   inspect __instanceh
   $(grab next_id from __)
   [[ -z ${__instanceh[$next_id]} ]] || return
-  inspect options
-  optionh[defn]=$__
+  inspect defns
+  resulth[defn]=$__
   inspect types
-  optionh[type]=$__
+  resulth[type]=$__
   inspect arguments
-  optionh[argument]=$__
+  resulth[argument]=$__
   inspect optionh
+  resulth[option]=$__
+  inspect resulth
   __instanceh[$next_id]=$__
   __=__instanceh["$next_id"]
   __instanceh[next_id]=$(( next_id++ ))
@@ -69,14 +73,14 @@ options_new () {
 
 options_parse () {
   local self=$1; shift
-  local -A optionh
+  local -A optionh=()
   local args=()
   local flags=()
   local i
 
   $(grab '( option type )' from "${!self}")
-  local -a options=$option
-  local -a types=$type
+  local -a options="$option"
+  local -a types="$type"
 
   while (( $# )); do
     case $1 in
@@ -196,8 +200,8 @@ strict_mode () {
 
 stuff () {
   [[ $2 == 'into'   ]] || return
-  [[ $1 == '('*')'  ]] && local -a refs=$1    || local -a refs=( "$1" )
-  [[ $3 == '('*')'  ]] && local -A resulth=$3 || local -A resulth=${!3}
+  [[ $1 == '('*')'  ]] && local -a refs="$1"    || local -a refs=( "$1" )
+  [[ $3 == '('*')'  ]] && local -A resulth="$3" || local -A resulth="${!3}"
   local ref
 
   for ref in "${refs[@]}"; do
@@ -225,8 +229,8 @@ traceback () {
 
 update () {
   [[ $2 == 'with'   ]] || return
-  [[ $1 == '('*')'  ]] && local -A hash=$1     || local -A hash=${!1}
-  [[ $3 == '('*')'  ]] && local -A updateh=$3  || local -A updateh=${!3}
+  [[ $1 == '('*')'  ]] && local -A hash="$1"     || local -A hash="${!1}"
+  [[ $3 == '('*')'  ]] && local -A updateh="$3"  || local -A updateh="${!3}"
   local key
 
   for key in "${!updateh[@]}"; do
@@ -237,7 +241,7 @@ update () {
 
 wed () {
   [[ $2 == 'with' ]] || return
-  [[ $1 == '('*')' ]] && local -a ary=$1 || local -a ary=${!1}
+  [[ $1 == '('*')' ]] && local -a ary="$1" || local -a ary="${!1}"
   local IFS=$3
 
   __=${ary[*]}
