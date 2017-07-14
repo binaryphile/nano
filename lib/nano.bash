@@ -30,7 +30,9 @@ options_new () {
   [[ $1 == '('*')' ]] && local -a defns=$1  || local -a defns=${!1}
   declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=([next_id]=0)
   local -A optionh=()
+  local -a arguments=()
   local -a options=()
+  local -a types=()
   local argument
   local defn
   local help
@@ -44,15 +46,21 @@ options_new () {
     long=${items[1]}
     argument=${items[2]}
     help=${items[3]}
-    stuff '(short long argument help)' into '()'
+    stuff '( short long argument help )' into '()'
     options+=( "$__" )
+    [[ -z $argument ]] &&     types+=( flag ) ||     types+=(   argument  )
+    [[ -z $argument ]] && arguments+=(   '' ) || arguments+=( "$argument" )
   done
 
   inspect __instanceh
   $(grab next_id from __)
   [[ -z ${__instanceh[$next_id]} ]] || return
   inspect options
-  optionh=( [defn]=$__ )
+  optionh[defn]=$__
+  inspect types
+  optionh[type]=$__
+  inspect arguments
+  optionh[argument]=$__
   inspect optionh
   __instanceh[$next_id]=$__
   __=__instanceh["$next_id"]

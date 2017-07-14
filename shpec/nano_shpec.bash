@@ -102,17 +102,17 @@ describe options_new
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
-  it "creates a definition of a flag option"; (
+  it "catalogs the type of a flag option"; (
     get_here_ary samples <<'    EOS'
       ( f '' '' 'a flag' )
     EOS
     get_here_str expected <<'    EOS'
-      ([0]="([argument]=\"\" [help]=\\"a flag\\" [short]=\\"f\\" [long]=\\"\\" )")
+      ([0]="flag")
     EOS
     inspect samples
     options_new __
-    $(grab defn from "${!__}")
-    assert equal "$expected" "$defn"
+    $(grab type from "${!__}")
+    assert equal "$expected" "$type"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
