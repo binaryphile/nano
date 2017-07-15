@@ -39,10 +39,11 @@ options_new () {
 
   for input in "${inputs[@]}"; do
     local -a items=$input
-    short=${items[0]}
-    long=${items[1]}
-    argument=${items[2]}
-    help=${items[3]}
+    set -- "${items[@]}"
+    short=$1
+    long=$2
+    argument=$3
+    help=$4
     stuff '( argument help )' into '()'
     [[ -n $short  ]] && optionh[$short]=$__
     [[ -n $long   ]] && optionh[$long]=$__
