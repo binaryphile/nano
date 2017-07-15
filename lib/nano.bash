@@ -5,9 +5,9 @@ die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
 
 grab () {
   [[ $2 == 'from'   ]] || return
-  [[ $3 == '('*')'  ]] && local -A argh="$3" || local -A argh="${!3}"
+  [[ $3 == '('*')'  ]] && local -A argh=$3 || local -A argh=${!3}
   case $1 in
-    '('*')' ) local -a vars="$1"              ;;
+    '('*')' ) local -a vars=$1                ;;
     '*'     ) local -a vars=( "${!argh[@]}" ) ;;
     *       ) local -a vars=(          "$1" ) ;;
   esac
@@ -27,8 +27,8 @@ index () {
 instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
 
 options_new () {
-  [[ $1 == '('*')' ]] && local -a inputs="$1" || local -a inputs="${!1}"
-  declare -p __instanceh >/dev/null 2>&1      || declare -Ag __instanceh=( [next_id]=0 )
+  [[ $1 == '('*')' ]] && local -a inputs=$1 || local -a inputs=${!1}
+  declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=( [next_id]=0 )
   local -A optionh=()
   local -A resulth=()
   local argument
@@ -42,7 +42,7 @@ options_new () {
   local types=()
 
   for defn in "${inputs[@]}"; do
-    local -a items="$defn"
+    local -a items=$defn
     short=${items[0]}
     long=${items[1]}
     argument=${items[2]}
@@ -79,8 +79,8 @@ options_parse () {
   local i
 
   $(grab '( option type )' from "${!self}")
-  local -a options="$option"
-  local -a types="$type"
+  local -a options=$option
+  local -a types=$type
 
   while (( $# )); do
     case $1 in
@@ -200,8 +200,8 @@ strict_mode () {
 
 stuff () {
   [[ $2 == 'into'   ]] || return
-  [[ $1 == '('*')'  ]] && local -a refs="$1"    || local -a refs=( "$1" )
-  [[ $3 == '('*')'  ]] && local -A resulth="$3" || local -A resulth="${!3}"
+  [[ $1 == '('*')'  ]] && local -a refs=$1    || local -a refs=( "$1" )
+  [[ $3 == '('*')'  ]] && local -A resulth=$3 || local -A resulth=${!3}
   local ref
 
   for ref in "${refs[@]}"; do
@@ -229,8 +229,8 @@ traceback () {
 
 update () {
   [[ $2 == 'with'   ]] || return
-  [[ $1 == '('*')'  ]] && local -A hash="$1"     || local -A hash="${!1}"
-  [[ $3 == '('*')'  ]] && local -A updateh="$3"  || local -A updateh="${!3}"
+  [[ $1 == '('*')'  ]] && local -A hash=$1     || local -A hash=${!1}
+  [[ $3 == '('*')'  ]] && local -A updateh=$3  || local -A updateh=${!3}
   local key
 
   for key in "${!updateh[@]}"; do
@@ -241,7 +241,7 @@ update () {
 
 wed () {
   [[ $2 == 'with' ]] || return
-  [[ $1 == '('*')' ]] && local -a ary="$1" || local -a ary="${!1}"
+  [[ $1 == '('*')' ]] && local -a ary=$1 || local -a ary=${!1}
   local IFS=$3
 
   __=${ary[*]}

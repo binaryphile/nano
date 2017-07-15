@@ -93,12 +93,12 @@ describe options_new
       ( f '' '' 'a flag' )
     EOS
     get_here_str expected <<'    EOS'
-      ([0]="([argument]=\"\" [help]=\\"a flag\\" [short]=\\"f\\" [long]=\\"\\" )")
+      ([argument]="" [help]="a flag\" )
     EOS
     inspect samples
     options_new __
-    $(grab defn from "${!__}")
-    assert equal "$expected" "$defn"
+    $(grab f from "${!__}")
+    assert equal "$expected" "$f"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
