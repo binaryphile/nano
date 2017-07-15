@@ -30,42 +30,27 @@ options_new () {
   [[ $1 == '('*')' ]] && local -a inputs=$1 || local -a inputs=${!1}
   declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=( [next_id]=0 )
   local -A optionh=()
-  local -A resulth=()
   local argument
-  local arguments=()
-  local defn
+  local input
   local help
   local long
-  local defns=()
+  local next_id
   local short
-  local spaces
-  local types=()
 
-  for defn in "${inputs[@]}"; do
-    local -a items=$defn
+  for input in "${inputs[@]}"; do
+    local -a items=$input
     short=${items[0]}
     long=${items[1]}
     argument=${items[2]}
     help=${items[3]}
-    stuff '( short long argument help )' into '()'
-    defns+=( "$__" )
-    optionh[${short:-long}]=$long
-    [[ -z $argument ]] &&     types+=( flag ) ||     types+=(   argument  )
-    [[ -z $argument ]] && arguments+=(   '' ) || arguments+=( "$argument" )
+    stuff '( argument help )' into '()'
+    [[ -n $short  ]] && optionh[$short]=$__
+    [[ -n $long   ]] && optionh[$long]=$__
   done
 
-  inspect __instanceh
-  $(grab next_id from __)
+  next_id=${__instanceh[next_id]}
   [[ -z ${__instanceh[$next_id]} ]] || return
-  inspect defns
-  resulth[defn]=$__
-  inspect types
-  resulth[type]=$__
-  inspect arguments
-  resulth[argument]=$__
   inspect optionh
-  resulth[option]=$__
-  inspect resulth
   __instanceh[$next_id]=$__
   __=__instanceh["$next_id"]
   __instanceh[next_id]=$(( next_id++ ))

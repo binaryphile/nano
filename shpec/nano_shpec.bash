@@ -88,12 +88,12 @@ describe grab
 end
 
 describe options_new
-  it "creates a definition of a flag option"; (
+  it "creates an entry for a short flag option"; (
     get_here_ary samples <<'    EOS'
       ( f '' '' 'a flag' )
     EOS
     get_here_str expected <<'    EOS'
-      ([argument]="" [help]="a flag\" )
+      ([argument]="" [help]="a flag" )
     EOS
     inspect samples
     options_new __
@@ -102,17 +102,17 @@ describe options_new
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
-  it "catalogs the type of a flag option"; (
+  it "creates an entry for a short argument option"; (
     get_here_ary samples <<'    EOS'
-      ( f '' '' 'a flag' )
+      ( f '' 'argument' 'an argument' )
     EOS
     get_here_str expected <<'    EOS'
-      ([0]="flag")
+      ([argument]="argument" [help]="an argument" )
     EOS
     inspect samples
     options_new __
-    $(grab type from "${!__}")
-    assert equal "$expected" "$type"
+    $(grab f from "${!__}")
+    assert equal "$expected" "$f"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
