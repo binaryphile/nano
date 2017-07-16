@@ -90,13 +90,13 @@ end
 describe options_new
   it "creates an entry for a short flag option"; (
     get_here_ary samples <<'    EOS'
-      ( o '' '' 'a flag' )
+      ( -o '' '' 'a flag' )
     EOS
     inspect samples
     options_new __
     $(grab o from "${!__}")
-    $(grab '( argument name help )' from o)
-    assert equal " o a flag" "$argument $name $help"
+    $(grab '( help name )' from o)
+    assert equal "a flag o" "$help $name"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -176,7 +176,7 @@ describe options_new
     printf -v format "$format" "$help" "$name"
     $(grab o from "${!result}")
     $(grab '( help name )' from o)
-    printf -v result "$format" "$help" "$name" 
+    printf -v result "$format" "$help" "$name"
     get_here_str expected <<'    EOS'
       a flag option
       a flag option

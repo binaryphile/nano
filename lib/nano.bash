@@ -3,6 +3,21 @@ readonly _nano=loaded
 
 die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
 
+generate () {
+  [[ $2 == 'from'   ]] || return
+  [[ $3 == '('*')'  ]] && local -a args=$3 || local -a args=${!3}
+  [[ $1 == '('*')'  ]] && local -a vars=$1 || local -a vars=( "$1" )
+  local var
+  local statement
+
+  set -- "${args[@]}"
+  for var in "${vars[@]}"; do
+    printf -v statement '%slocal %s=%q\n' "$statement" "$var" "$1"
+    shift
+  done
+  echo "eval $statement"
+}
+
 grab () {
   [[ $2 == 'from'   ]] || return
   [[ $3 == '('*')'  ]] && local -A argh=$3 || local -A argh=${!3}
@@ -39,13 +54,8 @@ options_new () {
   local short
 
   for input in "${inputs[@]}"; do
-    local -a items=$input
-    set -- "${items[@]}"
-    short=$1
-    long=$2
+    $(generate '( short long argument help )' from input)
     [[ -n $long ]] && name=$long || name=$short
-    argument=$3
-    help=$4
     stuff '( argument name help )' into '()'
     [[ -n $short  ]] && optionh[$short]=$__
     [[ -n $long   ]] && optionh[$long]=$__
