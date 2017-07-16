@@ -99,16 +99,7 @@ options_parse () {
   inspect optionh
 }
 
-part () {
-  [[ $2 == 'on' ]] || return
-  local IFS=$3
-  local results=()
-
-  results=( $1 )
-  inspect results
-}
-
-project () {
+package () {
   local project_name=$1
   local depth=${2:-1}
   local i
@@ -125,6 +116,15 @@ project () {
   path=''
   (( depth )) && for (( i = 0; i < depth; i++ )); do path+=/..; done
   printf "$statement\n" "$project_name" "$project_name" "$project_name" "${project_name^^}" "$path"
+}
+
+part () {
+  [[ $2 == 'on' ]] || return
+  local IFS=$3
+  local results=()
+
+  results=( $1 )
+  inspect results
 }
 
 put     () { printf '%s\n' "$@"   ;}

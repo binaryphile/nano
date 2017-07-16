@@ -92,13 +92,10 @@ describe options_new
     get_here_ary samples <<'    EOS'
       ( o '' '' 'a flag' )
     EOS
-    get_here_str expected <<'    EOS'
-      ([argument]="" [help]="a flag" )
-    EOS
     inspect samples
     options_new __
     $(grab o from "${!__}")
-    assert equal "$expected" "$o"
+    assert equal '([argument]="" [help]="a flag" )' "$o"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -106,13 +103,10 @@ describe options_new
     get_here_ary samples <<'    EOS'
       ( o '' argument 'an argument' )
     EOS
-    get_here_str expected <<'    EOS'
-      ([argument]="argument" [help]="an argument" )
-    EOS
     inspect samples
     options_new __
     $(grab o from "${!__}")
-    assert equal "$expected" "$o"
+    assert equal '([argument]="argument" [help]="an argument" )' "$o"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -120,13 +114,10 @@ describe options_new
     get_here_ary samples <<'    EOS'
       ( '' option '' 'a flag' )
     EOS
-    get_here_str expected <<'    EOS'
-      ([argument]="" [help]="a flag" )
-    EOS
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal "$expected" "$option"
+    assert equal '([argument]="" [help]="a flag" )' "$option"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -134,13 +125,32 @@ describe options_new
     get_here_ary samples <<'    EOS'
       ( '' option argument 'an argument' )
     EOS
-    get_here_str expected <<'    EOS'
-      ([argument]="argument" [help]="an argument" )
+    inspect samples
+    options_new __
+    $(grab option from "${!__}")
+    assert equal '([argument]="argument" [help]="an argument" )' "$option"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "creates an entry for a long flag option"; (
+    get_here_ary samples <<'    EOS'
+      ( '' option '' 'a flag' )
     EOS
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal "$expected" "$option"
+    assert equal '([argument]="" [help]="a flag" )' "$option"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "creates an entry for a long argument option"; (
+    get_here_ary samples <<'    EOS'
+      ( '' option argument 'an argument' )
+    EOS
+    inspect samples
+    options_new __
+    $(grab option from "${!__}")
+    assert equal '([argument]="argument" [help]="an argument" )' "$option"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
