@@ -58,45 +58,42 @@ options_new () {
 }
 
 options_parse () {
-  local self=$1; shift
-  local -A optionh=()
-  local args=()
-  local flags=()
-  local i
-
-  $(grab '( option type )' from "${!self}")
-  local -a options=$option
-  local -a types=$type
+  local _self=$1; shift
+  $(grab '*' from "${!_self}")
+  local -A _optionh=()
+  local _args=()
+  local _option
 
   while (( $# )); do
     case $1 in
       --*=*   ) set -- "${1%%=*}" "${1#*=}" "${@:2}";;
       -[^-]?* )
         [[ $1 =~ ${1//?/(.)} ]]
-        flags=( $(printf -- '-%s ' "${BASH_REMATCH[@]:2}") )
-        set -- "${flags[@]}" "${@:2}"
+        set -- $(printf -- '-%s ' "${BASH_REMATCH[@]:2}") "${@:2}"
         ;;
     esac
-    index options "$1" && {
-      i=$__
-      option=${options[i]}
-      case ${types[i]} in
-        'flag'      ) optionh[flag_$option]=1         ;;
-        'argument'  ) optionh[$option]=$2     ; shift ;;
-      esac
+    { [[ $1 == -[^-]* || $1 == --[^-]* ]] && [[ -v ${1##*-} ]] ;} && {
+      _option=${1##*-}
+      local -A _valueh=${!_option}
+      if [[ -n ${_valueh[argument]} ]]; then
+        _optionh[$_valueh[argument]]=$2
+        shift
+      else
+        _optionh[flag_$_option]=1
+      fi
       shift
       continue
     }
     case $1 in
-      '--'  ) shift                           ; args+=( "$@" ); break ;;
-      -*    ) puterr "unsupported option $1"  ; return 1              ;;
-      *     ) args+=( "$@" )                  ; break                 ;;
+      '--'  ) shift                           ; _args+=( "$@" ); break  ;;
+      -*    ) puterr "unsupported option $1"  ; return 1                ;;
+      *     ) _args+=( "$@" )                 ; break                   ;;
     esac
     shift
   done
-  inspect args
-  optionh[arg]=$__
-  inspect optionh
+  inspect _args
+  _optionh[arg]=$__
+  inspect _optionh
 }
 
 package () {

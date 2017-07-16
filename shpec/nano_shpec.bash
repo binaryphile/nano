@@ -189,20 +189,20 @@ describe options_new
   end
 end
 
-# describe options_parse
-#   it "accepts flag options"; (
-#     get_ary samples <<'    EOS'
-#       (f '' '' 'a flag')
-#     EOS
-#     inspect samples
-#     options_new __
-#     options_parse "$__" -f
-#     declare -A resulth=$__
-#     assert equal 1 "${resulth[flag_f]}"
-#     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
-#   end
-# end
-#
+describe options_parse
+  it "accepts flag options"; (
+    get_here_ary samples <<'    EOS'
+      ( o '' '' 'a flag' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" -o
+    $(grab flag_o from __)
+    assert equal 1 "$flag_o"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+end
+
 describe part
   it "splits a string on a delimiter"
     part one@two on @
