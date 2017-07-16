@@ -170,6 +170,23 @@ describe options_new
     assert equal "$expected" "$(printf '%s\n%s' "$option" "$o")"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
+
+  it "creates entries for an argument option with long and short"; (
+    get_here_ary samples <<'    EOS'
+      ( o option argument 'an argument' )
+    EOS
+    inspect samples
+    options_new __
+    result=$__
+    $(grab option from "${!result}")
+    $(grab o      from "${!result}")
+    get_here_str expected <<'    EOS'
+      ([argument]="argument" [help]="an argument" )
+      ([argument]="argument" [help]="an argument" )
+    EOS
+    assert equal "$expected" "$(printf '%s\n%s' "$option" "$o")"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
 end
 
 # describe options_parse
