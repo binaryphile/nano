@@ -34,6 +34,7 @@ options_new () {
   local input
   local help
   local long
+  local name
   local next_id
   local short
 
@@ -42,9 +43,10 @@ options_new () {
     set -- "${items[@]}"
     short=$1
     long=$2
+    [[ -n $long ]] && name=$long || name=$short
     argument=$3
     help=$4
-    stuff '( argument help )' into '()'
+    stuff '( argument name help )' into '()'
     [[ -n $short  ]] && optionh[$short]=$__
     [[ -n $long   ]] && optionh[$long]=$__
   done
@@ -58,11 +60,9 @@ options_new () {
 }
 
 options_parse () {
-  local _self=$1; shift
-  $(grab '*' from "${!_self}")
-  local -A _optionh=()
-  local _args=()
-  local _option
+  local -A optionh=${!1}; shift
+  local -A resulth=()
+  local args=()
 
   while (( $# )); do
     case $1 in
@@ -72,28 +72,25 @@ options_parse () {
         set -- $(printf -- '-%s ' "${BASH_REMATCH[@]:2}") "${@:2}"
         ;;
     esac
-    { [[ $1 == -[^-]* || $1 == --[^-]* ]] && [[ -v ${1##*-} ]] ;} && {
-      _option=${1##*-}
-      local -A _valueh=${!_option}
-      if [[ -n ${_valueh[argument]} ]]; then
-        _optionh[$_valueh[argument]]=$2
-        shift
-      else
-        _optionh[flag_$_option]=1
-      fi
+    { [[ $1 == -[^-] || $1 == --[^-]* ]] && [[ -n ${optionh[$1]:-} ]] ;} && {
+      $(grab '( argument name )' from "${optionh[$1]}")
+      case $argument in
+        ''  ) resulth[flag_$name]=1         ;;
+        *   ) resulth[$argument]=$2 ; shift ;;
+      esac
       shift
       continue
     }
     case $1 in
-      '--'  ) shift                           ; _args+=( "$@" ); break  ;;
-      -*    ) puterr "unsupported option $1"  ; return 1                ;;
-      *     ) _args+=( "$@" )                 ; break                   ;;
+      '--'  ) shift                           ; args+=( "$@" ); break ;;
+      -*    ) puterr "unsupported option $1"  ; return 1              ;;
+      *     ) args+=( "$@" )                  ; break                 ;;
     esac
     shift
   done
-  inspect _args
-  _optionh[arg]=$__
-  inspect _optionh
+  inspect args
+  resulth[arg]=$__
+  inspect resulth
 }
 
 package () {

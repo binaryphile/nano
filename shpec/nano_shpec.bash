@@ -95,7 +95,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab o from "${!__}")
-    assert equal '([argument]="" [help]="a flag" )' "$o"
+    $(grab '( argument name help )' from o)
+    assert equal " o a flag" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -106,7 +107,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab o from "${!__}")
-    assert equal '([argument]="argument" [help]="an argument" )' "$o"
+    $(grab '( argument name help )' from o)
+    assert equal "argument o an argument" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -117,7 +119,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal '([argument]="" [help]="a flag" )' "$option"
+    $(grab '( argument name help )' from option)
+    assert equal " option a flag" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -128,7 +131,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal '([argument]="argument" [help]="an argument" )' "$option"
+    $(grab '( argument name help )' from option)
+    assert equal "argument option an argument" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -139,7 +143,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal '([argument]="" [help]="a flag" )' "$option"
+    $(grab '( argument name help )' from option)
+    assert equal " option a flag" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -150,7 +155,8 @@ describe options_new
     inspect samples
     options_new __
     $(grab option from "${!__}")
-    assert equal '([argument]="argument" [help]="an argument" )' "$option"
+    $(grab '( argument name help )' from option)
+    assert equal "argument option an argument" "$argument $name $help"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -161,13 +167,21 @@ describe options_new
     inspect samples
     options_new __
     result=$__
-    $(grab option from "${!result}")
-    $(grab o      from "${!result}")
-    get_here_str expected <<'    EOS'
-      ([argument]="" [help]="a flag" )
-      ([argument]="" [help]="a flag" )
+    get_here_str format <<'    EOS'
+      %s %s
+      %%s %%s
     EOS
-    assert equal "$expected" "$(printf '%s\n%s' "$option" "$o")"
+    $(grab option from "${!result}")
+    $(grab '( help name )' from option)
+    printf -v format "$format" "$help" "$name"
+    $(grab o from "${!result}")
+    $(grab '( help name )' from o)
+    printf -v result "$format" "$help" "$name" 
+    get_here_str expected <<'    EOS'
+      a flag option
+      a flag option
+    EOS
+    assert equal "$expected" "$result"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 
@@ -178,13 +192,21 @@ describe options_new
     inspect samples
     options_new __
     result=$__
-    $(grab option from "${!result}")
-    $(grab o      from "${!result}")
-    get_here_str expected <<'    EOS'
-      ([argument]="argument" [help]="an argument" )
-      ([argument]="argument" [help]="an argument" )
+    get_here_str format <<'    EOS'
+      %s %s %s
+      %%s %%s %%s
     EOS
-    assert equal "$expected" "$(printf '%s\n%s' "$option" "$o")"
+    $(grab option from "${!result}")
+    $(grab '( argument help name )' from option)
+    printf -v format "$format" "$argument" "$help" "$name"
+    $(grab o from "${!result}")
+    $(grab '( argument help name )' from o)
+    printf -v result "$format" "$argument" "$help" "$name"
+    get_here_str expected <<'    EOS'
+      argument an argument option
+      argument an argument option
+    EOS
+    assert equal "$expected" "$result"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
@@ -192,7 +214,7 @@ end
 describe options_parse
   it "accepts flag options"; (
     get_here_ary samples <<'    EOS'
-      ( o '' '' 'a flag' )
+      ( -o '' '' 'a flag' )
     EOS
     inspect samples
     options_new __
