@@ -102,7 +102,7 @@ describe options_new
 
   it "creates an entry for a short argument option"; (
     get_here_ary samples <<'    EOS'
-      ( o '' argument 'an argument' )
+      ( -o '' argument 'an argument' )
     EOS
     inspect samples
     options_new __
@@ -114,7 +114,7 @@ describe options_new
 
   it "creates an entry for a long flag option"; (
     get_here_ary samples <<'    EOS'
-      ( '' option '' 'a flag' )
+      ( '' --option '' 'a flag' )
     EOS
     inspect samples
     options_new __
@@ -126,7 +126,7 @@ describe options_new
 
   it "creates an entry for a long argument option"; (
     get_here_ary samples <<'    EOS'
-      ( '' option argument 'an argument' )
+      ( '' --option argument 'an argument' )
     EOS
     inspect samples
     options_new __
@@ -138,7 +138,7 @@ describe options_new
 
   it "creates an entry for a long flag option"; (
     get_here_ary samples <<'    EOS'
-      ( '' option '' 'a flag' )
+      ( '' --option '' 'a flag' )
     EOS
     inspect samples
     options_new __
@@ -150,7 +150,7 @@ describe options_new
 
   it "creates an entry for a long argument option"; (
     get_here_ary samples <<'    EOS'
-      ( '' option argument 'an argument' )
+      ( '' --option argument 'an argument' )
     EOS
     inspect samples
     options_new __
@@ -162,7 +162,7 @@ describe options_new
 
   it "creates entries for a flag option with long and short"; (
     get_here_ary samples <<'    EOS'
-      ( o option '' 'a flag' )
+      ( -o --option '' 'a flag' )
     EOS
     inspect samples
     options_new __
@@ -187,7 +187,7 @@ describe options_new
 
   it "creates entries for an argument option with long and short"; (
     get_here_ary samples <<'    EOS'
-      ( o option argument 'an argument' )
+      ( -o --option argument 'an argument' )
     EOS
     inspect samples
     options_new __

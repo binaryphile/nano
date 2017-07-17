@@ -1,12 +1,10 @@
 [[ -n ${_nano:-} ]] && return
 readonly _nano=loaded
 
-die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
-
-generate () {
-  [[ $2 == 'from'   ]] || return
-  [[ $3 == '('*')'  ]] && local -a args=$3 || local -a args=${!3}
-  [[ $1 == '('*')'  ]] && local -a vars=$1 || local -a vars=( "$1" )
+assign () {
+  [[ $2 == 'to'   ]] || return
+  [[ $1 == '('*')'  ]] && local -a args=$1 || local -a args=${!1}
+  [[ $3 == '('*')'  ]] && local -a vars=$3 || local -a vars=( "$3" )
   local var
   local statement
 
@@ -17,6 +15,8 @@ generate () {
   done
   echo "eval $statement"
 }
+
+die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
 
 grab () {
   [[ $2 == 'from'   ]] || return
@@ -35,26 +35,21 @@ grab () {
   echo "eval $statement"
 }
 
-index () {
-  :
-}
-
 instantiate () { printf -v "$1" '%s' "$(eval "echo ${!1}")" ;}
 
 options_new () {
   [[ $1 == '('*')' ]] && local -a inputs=$1 || local -a inputs=${!1}
   declare -p __instanceh >/dev/null 2>&1    || declare -Ag __instanceh=( [next_id]=0 )
   local -A optionh=()
-  local argument
   local input
-  local help
-  local long
   local name
   local next_id
-  local short
 
   for input in "${inputs[@]}"; do
-    $(generate '( short long argument help )' from input)
+    $(assign input to '( short long argument help )')
+    short=${short#-}
+    long=${long#--}
+    long=${long//-/_}
     [[ -n $long ]] && name=$long || name=$short
     stuff '( argument name help )' into '()'
     [[ -n $short  ]] && optionh[$short]=$__
