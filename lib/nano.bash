@@ -57,7 +57,7 @@ options_new () {
   done
 
   next_id=${__instanceh[next_id]}
-  [[ -z ${__instanceh[$next_id]} ]] || return
+  [[ -z ${__instanceh[$next_id]:-} ]] || return
   inspect optionh
   __instanceh[$next_id]=$__
   __=__instanceh["$next_id"]
@@ -84,7 +84,7 @@ options_parse () {
       $(grab '( argument name )' from "${optionh[$option]}")
       case $argument in
         ''  ) resulth[flag_$name]=1         ;;
-        *   ) resulth[$argument]=$2 ; shift ;;
+        *   ) resulth[$argument]=$2; shift  ;;
       esac
       shift
       continue
@@ -102,7 +102,7 @@ options_parse () {
 }
 
 package () {
-  local project_name=$1
+  local package_name=$1
   local depth=${2:-1}
   local i
   local path
@@ -117,7 +117,7 @@ package () {
   EOS
   path=''
   (( depth )) && for (( i = 0; i < depth; i++ )); do path+=/..; done
-  printf "$statement\n" "$project_name" "$project_name" "$project_name" "${project_name^^}" "$path"
+  printf "$statement\n" "$package_name" "$package_name" "$package_name" "${package_name^^}" "$path"
 }
 
 part () {
