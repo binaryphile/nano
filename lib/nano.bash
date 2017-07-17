@@ -68,6 +68,7 @@ options_parse () {
   local -A optionh=${!1}; shift
   local -A resulth=()
   local args=()
+  local option
 
   while (( $# )); do
     case $1 in
@@ -77,8 +78,10 @@ options_parse () {
         set -- $(printf -- '-%s ' "${BASH_REMATCH[@]:2}") "${@:2}"
         ;;
     esac
-    { [[ $1 == -[^-] || $1 == --[^-]* ]] && [[ -n ${optionh[$1]:-} ]] ;} && {
-      $(grab '( argument name )' from "${optionh[$1]}")
+    option=${1#-}
+    option=${option#-}
+    { [[ $1 =~ ^-{1,2}[^-] ]] && [[ -n ${optionh[$option]:-} ]] ;} && {
+      $(grab '( argument name )' from "${optionh[$option]}")
       case $argument in
         ''  ) resulth[flag_$name]=1         ;;
         *   ) resulth[$argument]=$2 ; shift ;;
