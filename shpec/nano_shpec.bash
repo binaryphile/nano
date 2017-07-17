@@ -314,6 +314,19 @@ describe options_parse
     assert equal '1 1 value3 value4 1 value6' "$flag_option1 $flag_o $argument3 $argument4 $flag_option5 $argument6"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
+
+  it "outputs arguments"; (
+    get_here_ary samples <<'    EOS'
+      ( -o  '' '' 'flag 2' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" -o arg1 arg2
+    $(grab arg from __)
+    $(assign arg to '( one two )' )
+    assert equal 'arg1 arg2' "$one $two"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
 end
 
 describe part
