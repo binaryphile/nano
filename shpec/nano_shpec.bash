@@ -212,7 +212,7 @@ describe options_new
 end
 
 describe options_parse
-  it "accepts flag options"; (
+  it "accepts a short flag option"; (
     get_here_ary samples <<'    EOS'
       ( -o '' '' 'a flag' )
     EOS
@@ -221,6 +221,54 @@ describe options_parse
     options_parse "$__" -o
     $(grab flag_o from __)
     assert equal 1 "$flag_o"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "accepts a long flag option"; (
+    get_here_ary samples <<'    EOS'
+      ( '' --option '' 'a flag' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" --option
+    $(grab flag_option from __)
+    assert equal 1 "$flag_option"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "accepts a short argument option"; (
+    get_here_ary samples <<'    EOS'
+      ( -o '' argument 'an argument' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" -o value
+    $(grab argument from __)
+    assert equal value "$argument"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "accepts a long argument option without an equals sign"; (
+    get_here_ary samples <<'    EOS'
+      ( '' --option argument 'an argument' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" --option value
+    $(grab argument from __)
+    assert equal value "$argument"
+    return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
+  end
+
+  it "accepts a long argument option with an equals sign"; (
+    get_here_ary samples <<'    EOS'
+      ( '' --option argument 'an argument' )
+    EOS
+    inspect samples
+    options_new __
+    options_parse "$__" --option=value
+    $(grab argument from __)
+    assert equal value "$argument"
     return "$_shpec_failures" ); : $(( _shpec_failures += $? ))
   end
 end
