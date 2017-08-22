@@ -16,7 +16,36 @@ assign () {
   echo "eval $statement"
 }
 
+bring () { (
+  [[ $2 == 'from'   ]] || return
+  [[ $1 == '('*')'  ]] && local -a functions=$1 || local -a functions=${!1}
+  local library=$3
+
+  require library
+  [[ -n ${required_imports[@]:-} ]] && functions+=( "${_required_imports[@]}" )
+  inspect functions
+  _echo_functions __
+) }
+
 die () { [[ -n $1 ]] && puterr "$1"; exit "${2:-1}" ;}
+
+_echo_function () {
+  local function=$1
+  local IFS=$'\n'
+
+  set -- $(type function)
+  shift
+  printf '%s\n' "$*"
+}
+
+_echo_functions () {
+  [[ $1 == '('*')' ]] && local -a functions=$1 || local -a functions=${!1}
+  local function
+
+  for function in "${functions[@]}"; do
+    _echo_function "$function"
+  done
+}
 
 grab () {
   [[ $2 == 'from'   ]] || return
@@ -162,6 +191,34 @@ inspect () {
 }
 
 return_if_sourced () { echo 'eval return 0 2>/dev/null ||:' ;}
+
+require () {
+  local library=$1
+  local IFS=$IFS
+  local extension
+  local extensions=()
+  local file
+  local path
+
+  extensions=( .bash .sh '' )
+  if [[ $library == */* ]]; then
+    for extension in "${extensions[@]}"; do
+      [[ -e $library$extension ]] && break
+    done
+    file=$library$extension
+  else
+    [[ -n ${PATH:-} ]] || return
+    IFS=:
+    for path in $PATH; do
+      for extension in "${extensions[@]}"; do
+        [[ -e $path/$library$extension ]] && break 2
+      done
+    done
+    file=$path/$library$extension
+  fi
+  [[ -e $file ]] || return
+  source "$file"
+}
 
 strict_mode () {
   local status=$1
